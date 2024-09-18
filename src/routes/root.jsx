@@ -1,11 +1,43 @@
-import { Outlet } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData, Outlet, Form } from "react-router-dom";
+
+import { getContacts, CreateContacts } from "../contacts";
+
+export async function loader() {
+  const contacts = await getContacts();
+  return { contacts };
+}
 
 export default function Root() {
+  const { contacts } = useLoaderData();
+
   return (
     <>
       <div id="sidebar">
         <h1>React Router Contacts</h1>
+        <nav>
+          {contacts.length ? (
+            <ul>
+              {contacts.map((contact) => (
+                <li key={contact.id}>
+                  <Link to={`contacts/${contact.id}`}>
+                    {contact.first || contact.last ? (
+                      <>
+                        {contact.first} {contact.last}
+                      </>
+                    ) : (
+                      <i>No Name</i>
+                    )}{" "}
+                    {contact.favorite && <span>★</span>}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>
+              <i>No contacts</i>
+            </p>
+          )}
+        </nav>
         <div>
           <form id="search-form" role="search">
             <input
@@ -19,9 +51,9 @@ export default function Root() {
             <div className="sr-only" aria-live="polite"></div>
           </form>
 
-          <form method="post">
+          <Form method="post">
             <button type="submit">New</button>
-          </form>
+          </Form>
         </div>
         <nav>
           <ul>
